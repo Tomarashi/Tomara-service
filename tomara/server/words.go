@@ -9,7 +9,7 @@ func SetUpWordsRouter(mainRoute *gin.RouterGroup) {
 	wordsController := new(controller.WordController)
 
 	wordsRouter := mainRoute.Group("/word")
-    {
-        wordsRouter.GET("/", wordsController.Hello)
-    }
+	{
+		wordsRouter.GET("/get", wordsController.GetWords)
+	}
 }

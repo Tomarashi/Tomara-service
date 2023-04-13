@@ -7,5 +7,8 @@ import (
 
 func Start(host string, port int) {
 	app := server.GetServer()
-	app.Run(fmt.Sprintf("%s:%d", host, port))
+	err := app.Run(fmt.Sprintf("%s:%d", host, port))
+	if err != nil {
+		panic(err)
+	}
 }
