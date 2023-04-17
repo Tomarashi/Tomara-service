@@ -3,10 +3,15 @@ module tomara-service
 go 1.19
 
 require (
+	github.com/elastic/go-elasticsearch/v8 v8.4.0-alpha.1.0.20230331155458-2691728e0254
+	github.com/gin-gonic/gin v1.9.0
+)
+
+require (
 	github.com/bytedance/sonic v1.8.7 // indirect
 	github.com/chenzhuoyu/base64x v0.0.0-20221115062448-fe3a3abad311 // indirect
+	github.com/elastic/elastic-transport-go/v8 v8.0.0-20230329154755-1a3c63de0db6 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/gin-gonic/gin v1.9.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
 	github.com/go-playground/validator/v10 v10.12.0 // indirect
