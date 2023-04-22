@@ -4,6 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"tomara-service/tomara/repository"
+	"tomara-service/tomara/utils"
 )
 
 const (
@@ -13,7 +15,14 @@ const (
 	queryParamWordN   = "word_n"
 )
 
-type WordController struct{}
+type WordController struct {
+	Repository repository.ITomaraRepository
+}
+
+type GetWordsResponse struct {
+	Words      []string `json:"words"`
+	TakenNanos int64    `json:"taken_ns"`
+}
 
 func (w WordController) GetWords(c *gin.Context) {
 	subWord, exists := c.GetQuery(queryParamSubWord)
@@ -27,5 +36,8 @@ func (w WordController) GetWords(c *gin.Context) {
 			wordNumber = wordNArg
 		}
 	}
-	c.String(http.StatusOK, "%s, %d", subWord, wordNumber)
+	startTime := utils.CurrentNanos()
+	result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
+	takenTime := utils.FromTimeInNanos(startTime)
+	c.JSON(http.StatusOK, GetWordsResponse{Words: result, TakenNanos: takenTime})
 }
