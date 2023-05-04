@@ -2,6 +2,15 @@
 Extension's Service
 
 ### API Documentation
+
+_Host_: `localhost`
+
+_Port_: `8081`
+
+`GET /word/greetings`
+
+_Send request to check if service works_
+
 `GET /word/get`
 
 | Parameter | Type   | Default  | Documentation       |

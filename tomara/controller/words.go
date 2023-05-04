@@ -13,6 +13,8 @@ const (
 
 	queryParamSubWord = "sub_word"
 	queryParamWordN   = "word_n"
+
+	allowOriginHeaderName = "Access-Control-Allow-Origin"
 )
 
 type WordController struct {
@@ -24,10 +26,20 @@ type GetWordsResponse struct {
 	TakenNanos int64    `json:"taken_ns"`
 }
 
+func (w WordController) Greetings(c *gin.Context) {
+	c.Header(allowOriginHeaderName, "*")
+	c.String(http.StatusOK, "Hello!")
+}
+
 func (w WordController) GetWords(c *gin.Context) {
 	subWord, exists := c.GetQuery(queryParamSubWord)
+	c.Header(allowOriginHeaderName, "*")
 	if !exists {
 		c.String(http.StatusBadRequest, HttpParameterNotExist(queryParamSubWord))
+		return
+	}
+	if subWord == "" {
+		c.JSON(http.StatusOK, GetWordsResponse{Words: []string{}, TakenNanos: 0})
 		return
 	}
 	wordNumber := defaultWordN

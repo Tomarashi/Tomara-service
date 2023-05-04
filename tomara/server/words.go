@@ -6,12 +6,13 @@ import (
 	"tomara-service/tomara/repository"
 )
 
-func SetUpWordsRouter(mainRoute *gin.RouterGroup) {
+func SetUpWordsRouter(mainRoute *gin.RouterGroup, tomaraRepository repository.ITomaraRepository) {
 	wordsController := new(controller.WordController)
-	wordsController.Repository = repository.MakeFakeRepositoryFromFile("data/dev-words.txt")
+	wordsController.Repository = tomaraRepository
 
 	wordsRouter := mainRoute.Group("/word")
 	{
+		wordsRouter.GET("/greetings", wordsController.Greetings)
 		wordsRouter.GET("/get", wordsController.GetWords)
 	}
 }
