@@ -12,7 +12,7 @@ func GetServer() *gin.Engine {
 
 	tomaraRepository := repository.MakeFakeRepositoryFromFile("data/dev-words.txt")
 
-	router := server.Group("/")
+	router := server.Group("/extension/api")
 	SetUpWordsRouter(router, tomaraRepository)
 
 	return server
