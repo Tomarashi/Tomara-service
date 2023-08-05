@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	DoPrintRoutes = false
+
 	ApiRootPath = "/extension/api"
 )
 
@@ -22,7 +24,9 @@ func GetServer(tomaraRepository repository.ITomaraRepository) *gin.Engine {
 	router := server.Group(ApiRootPath)
 	SetUpWordsRouter(router, tomaraRepository)
 
-	PrintRoutes(server)
+	if DoPrintRoutes {
+		PrintRoutes(server)
+	}
 
 	return server
 }

@@ -11,12 +11,13 @@ import (
 var methodIndexes map[string]int
 
 func init() {
-	methodIndexes = map[string]int{}
-	methodIndexes["GET"] = 0
-	methodIndexes["POST"] = 1
-	methodIndexes["PUT"] = 2
-	methodIndexes["HEAD"] = 3
-	methodIndexes["DELETE"] = 4
+	methodIndexes = map[string]int{
+		"GET":    0,
+		"POST":   1,
+		"PUT":    2,
+		"HEAD":   3,
+		"DELETE": 4,
+	}
 }
 
 func PrintRoutes(engine *gin.Engine) {
