@@ -6,7 +6,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"gopkg.in/yaml.v3"
 	"time"
-	"tomara-service/tomara/utils"
+	"tomara-service/tomara/configs"
 )
 
 const (
@@ -26,8 +26,7 @@ type MySqlRepositoryConfig struct {
 }
 
 func init() {
-	data := utils.ReadFile("tomara/configs/mysql.yaml")
-	err := yaml.Unmarshal(data, &config)
+	err := yaml.Unmarshal(configs.MySqlConfigYamlString, &config)
 	if err != nil {
 		panic(err)
 	}

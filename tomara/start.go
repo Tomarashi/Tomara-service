@@ -6,7 +6,7 @@ import (
 )
 
 func Start(host string, port int) {
-	app := server.GetServer()
+	app := server.GetServerDefault()
 	err := app.Run(fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
 		panic(err)

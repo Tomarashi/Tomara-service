@@ -9,12 +9,15 @@ const (
 	ApiRootPath = "/extension/api"
 )
 
-func GetServer() *gin.Engine {
+func GetServerDefault() *gin.Engine {
+	tomaraRepository := repository.MakeMySqlRepositoryDefaultConfig()
+	return GetServer(tomaraRepository)
+}
+
+func GetServer(tomaraRepository repository.ITomaraRepository) *gin.Engine {
 	server := gin.New()
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
-
-	tomaraRepository := repository.MakeMySqlRepositoryDefaultConfig()
 
 	router := server.Group(ApiRootPath)
 	SetUpWordsRouter(router, tomaraRepository)
