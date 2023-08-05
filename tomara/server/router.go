@@ -19,5 +19,7 @@ func GetServer() *gin.Engine {
 	router := server.Group(ApiRootPath)
 	SetUpWordsRouter(router, tomaraRepository)
 
+	PrintRoutes(server)
+
 	return server
 }

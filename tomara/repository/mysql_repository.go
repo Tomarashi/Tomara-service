@@ -31,7 +31,6 @@ func init() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(config)
 }
 
 func (m MySqlRepository) formatQueryString(
