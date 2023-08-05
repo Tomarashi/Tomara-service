@@ -5,14 +5,18 @@ import (
 	"tomara-service/tomara/repository"
 )
 
+const (
+	ApiRootPath = "/extension/api"
+)
+
 func GetServer() *gin.Engine {
 	server := gin.New()
 	server.Use(gin.Logger())
 	server.Use(gin.Recovery())
 
-	tomaraRepository := repository.MakeFakeRepositoryFromFile("data/dev-words.txt")
+	tomaraRepository := repository.MakeMySqlRepositoryDefaultConfig()
 
-	router := server.Group("/extension/api")
+	router := server.Group(ApiRootPath)
 	SetUpWordsRouter(router, tomaraRepository)
 
 	return server

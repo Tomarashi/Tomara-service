@@ -4,15 +4,34 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"gopkg.in/yaml.v3"
 	"time"
+	"tomara-service/tomara/utils"
 )
 
 const (
 	responseLimit = 500
 )
 
+var config MySqlRepositoryConfig
+
 type MySqlRepository struct {
 	database *sql.DB
+}
+
+type MySqlRepositoryConfig struct {
+	User     string `yaml:"user"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
+}
+
+func init() {
+	data := utils.ReadFile("tomara/configs/mysql.yaml")
+	err := yaml.Unmarshal(data, &config)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(config)
 }
 
 func (m MySqlRepository) formatQueryString(
@@ -71,4 +90,8 @@ func MakeMySqlRepository(username string, password string, databaseName string) 
 	database.SetMaxOpenConns(10)
 	database.SetMaxIdleConns(10)
 	return &MySqlRepository{database: database}
+}
+
+func MakeMySqlRepositoryDefaultConfig() *MySqlRepository {
+	return MakeMySqlRepository(config.User, config.Password, config.Database)
 }
