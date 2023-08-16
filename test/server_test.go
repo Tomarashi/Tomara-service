@@ -19,8 +19,9 @@ import (
 var tomaraServer *gin.Engine
 
 type TestResponse struct {
-	Words []string `json:"words"`
-	Time  int      `json:"taken_ns"`
+	Words     []string `json:"words"`
+	Time      int      `json:"taken_ns"`
+	RequestId string   `json:"request_id"`
 }
 
 func (r *TestResponse) Parse(value []byte) {
@@ -46,7 +47,7 @@ func TestGreetings(t *testing.T) {
 	assert.Equal(t, "Hello!", recorder.Body.String())
 }
 
-func TestGet(t *testing.T) {
+func TestGetOneCharNoLimit(t *testing.T) {
 	var testResponse TestResponse
 	var recorder *httptest.ResponseRecorder
 	var request *http.Request
@@ -61,6 +62,12 @@ func TestGet(t *testing.T) {
 	testResponse.Parse(recorder.Body.Bytes())
 	assert.Equal(t, 200, recorder.Code)
 	assert.Equal(t, 213, len(testResponse.Words))
+}
+
+func TestGetTwoCharsNoLimit(t *testing.T) {
+	var testResponse TestResponse
+	var recorder *httptest.ResponseRecorder
+	var request *http.Request
 
 	recorder = httptest.NewRecorder()
 	request = get(formatUri(map[string]interface{}{
@@ -76,6 +83,27 @@ func TestGet(t *testing.T) {
 		ind := strings.Index(word, "ბი")
 		assert.Equal(t, 0, ind)
 	}
+}
+
+func TestGetOneCharNoLimitWithRequestId(t *testing.T) {
+	var testResponse TestResponse
+	var recorder *httptest.ResponseRecorder
+	var request *http.Request
+
+	requestId := "random-id"
+
+	recorder = httptest.NewRecorder()
+	request = get(formatUri(map[string]interface{}{
+		"sub_word":   "ა",
+		"word_n":     math.MaxInt,
+		"request_id": requestId,
+	}))
+
+	tomaraServer.ServeHTTP(recorder, request)
+	testResponse.Parse(recorder.Body.Bytes())
+	assert.Equal(t, 200, recorder.Code)
+	assert.Equal(t, 213, len(testResponse.Words))
+	assert.Equal(t, requestId, testResponse.RequestId)
 }
 
 func formatUri(params map[string]interface{}) string {

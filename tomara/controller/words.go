@@ -11,8 +11,9 @@ import (
 const (
 	defaultWordN = 8
 
-	queryParamSubWord = "sub_word"
-	queryParamWordN   = "word_n"
+	queryParamSubWord   = "sub_word"
+	queryParamWordN     = "word_n"
+	queryParamRequestId = "request_id"
 
 	allowOriginHeaderName = "Access-Control-Allow-Origin"
 )
@@ -24,6 +25,12 @@ type WordController struct {
 type GetWordsResponse struct {
 	Words      []string `json:"words"`
 	TakenNanos int64    `json:"taken_ns"`
+}
+
+type GetWordsResponseWithReqId struct {
+	Words      []string `json:"words"`
+	TakenNanos int64    `json:"taken_ns"`
+	RequestId  string   `json:"request_id"`
 }
 
 func (w WordController) Greetings(c *gin.Context) {
@@ -51,5 +58,9 @@ func (w WordController) GetWords(c *gin.Context) {
 	startTime := utils.CurrentNanos()
 	result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
 	takenTime := utils.FromTimeInNanos(startTime)
-	c.JSON(http.StatusOK, GetWordsResponse{Words: result, TakenNanos: takenTime})
+	if requestId, exists := c.GetQuery(queryParamRequestId); exists {
+		c.JSON(http.StatusOK, GetWordsResponseWithReqId{Words: result, TakenNanos: takenTime, RequestId: requestId})
+	} else {
+		c.JSON(http.StatusOK, GetWordsResponse{Words: result, TakenNanos: takenTime})
+	}
 }
