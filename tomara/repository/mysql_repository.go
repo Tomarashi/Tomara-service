@@ -7,10 +7,13 @@ import (
 	"gopkg.in/yaml.v3"
 	"time"
 	"tomara-service/tomara/configs"
+	"tomara-service/tomara/utils"
 )
 
 const (
 	responseLimit = 500
+
+	colNameWordEng = "word_eng"
 )
 
 var config MySqlRepositoryConfig
@@ -33,7 +36,7 @@ func init() {
 }
 
 func (m MySqlRepository) formatQueryString(
-	substring string, limit int, onlyStartsWith bool,
+	searchColumnName string, substring string, limit int, onlyStartsWith bool,
 ) string {
 	var searchTypeString string
 	if onlyStartsWith {
@@ -42,8 +45,8 @@ func (m MySqlRepository) formatQueryString(
 		searchTypeString = "%"
 	}
 	return fmt.Sprintf(
-		`SELECT word_geo FROM words WHERE word_geo LIKE "%s%s%%" ORDER BY frequency DESC LIMIT %d`,
-		searchTypeString, substring, limit,
+		`SELECT word_geo FROM words WHERE %s LIKE "%s%s%%" ORDER BY frequency DESC LIMIT %d`,
+		searchColumnName, searchTypeString, substring, limit,
 	)
 }
 
@@ -51,7 +54,8 @@ func (m MySqlRepository) getWordsAny(substring string, limit int, onlyStartsWith
 	if limit < 0 || limit > responseLimit {
 		limit = responseLimit
 	}
-	queryString := m.formatQueryString(substring, limit, onlyStartsWith)
+	engEquivSubstr := utils.GeoWordToEng(substring)
+	queryString := m.formatQueryString(colNameWordEng, engEquivSubstr, limit, onlyStartsWith)
 	queryResult, err := m.database.Query(queryString)
 	if err != nil {
 		return err, nil
