@@ -1,2 +1,2 @@
 echo "Building..."
-export GIN_MODE=release ; go build -o tomara-service main.go
+export GIN_MODE=release ; go build main.go

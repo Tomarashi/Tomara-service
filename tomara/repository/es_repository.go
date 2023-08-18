@@ -28,12 +28,12 @@ func createQuery(fieldName string, resultSize int) string {
 	}`, fieldName, resultSize)
 }
 
-func (e ElasticSearchRepository) GetWordsStartsWith(substring string, limit int) []string {
+func (e *ElasticSearchRepository) GetWordsStartsWith(substring string, limit int) (error, []string) {
 	//TODO implement me
 	panic(NotImplementedErrorString)
 }
 
-func (e ElasticSearchRepository) GetWordsContains(substring string, limit int) []string {
+func (e *ElasticSearchRepository) GetWordsContains(substring string, limit int) (error, []string) {
 	//TODO implement me
 	panic(NotImplementedErrorString)
 }

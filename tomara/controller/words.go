@@ -22,6 +22,10 @@ type WordController struct {
 	Repository repository.ITomaraRepository
 }
 
+type GetWordsFailResponse struct {
+	ErrorMsg string `json:"error_msg"`
+}
+
 type GetWordsResponse struct {
 	Words      []string `json:"words"`
 	TakenNanos int64    `json:"taken_ns"`
@@ -56,7 +60,11 @@ func (w WordController) GetWords(c *gin.Context) {
 		}
 	}
 	startTime := utils.CurrentNanos()
-	result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
+	err, result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, GetWordsFailResponse{ErrorMsg: err.Error()})
+		return
+	}
 	takenTime := utils.FromTimeInNanos(startTime)
 	if requestId, exists := c.GetQuery(queryParamRequestId); exists {
 		c.JSON(http.StatusOK, GetWordsResponseWithReqId{Words: result, TakenNanos: takenTime, RequestId: requestId})

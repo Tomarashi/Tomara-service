@@ -47,34 +47,34 @@ func (m MySqlRepository) formatQueryString(
 	)
 }
 
-func (m MySqlRepository) getWordsAny(substring string, limit int, onlyStartsWith bool) []string {
+func (m MySqlRepository) getWordsAny(substring string, limit int, onlyStartsWith bool) (error, []string) {
 	if limit < 0 || limit > responseLimit {
 		limit = responseLimit
 	}
 	queryString := m.formatQueryString(substring, limit, onlyStartsWith)
 	queryResult, err := m.database.Query(queryString)
 	if err != nil {
-		panic(err)
+		return err, nil
 	}
 	result := make([]string, 0, limit)
 	for queryResult.Next() {
 		var row string
 		if err := queryResult.Scan(&row); err != nil {
-			panic(err)
+			return err, nil
 		}
 		result = append(result, row)
 	}
 	if err := queryResult.Close(); err != nil {
-		panic(err)
+		return err, nil
 	}
-	return result
+	return nil, result
 }
 
-func (m MySqlRepository) GetWordsStartsWith(substring string, limit int) []string {
+func (m MySqlRepository) GetWordsStartsWith(substring string, limit int) (error, []string) {
 	return m.getWordsAny(substring, limit, true)
 }
 
-func (m MySqlRepository) GetWordsContains(substring string, limit int) []string {
+func (m MySqlRepository) GetWordsContains(substring string, limit int) (error, []string) {
 	return m.getWordsAny(substring, limit, false)
 }
 

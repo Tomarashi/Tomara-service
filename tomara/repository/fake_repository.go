@@ -29,17 +29,17 @@ func (f FakeRepository) extractWords(indexes []int) []string {
 	return result
 }
 
-func (f FakeRepository) GetWordsStartsWith(substring string, limit int) []string {
+func (f FakeRepository) GetWordsStartsWith(substring string, limit int) (error, []string) {
 	substringBytes := append([]byte{0}, []byte(substring)...)
 	preResult := f.extractWords(f.data.Lookup(substringBytes, -1))
 	sort.Strings(preResult)
 	if limit < 0 || limit > len(preResult) {
 		limit = len(preResult)
 	}
-	return preResult[:limit]
+	return nil, preResult[:limit]
 }
 
-func (f FakeRepository) GetWordsContains(substring string, limit int) []string {
+func (f FakeRepository) GetWordsContains(substring string, limit int) (error, []string) {
 	preResult := f.extractWords(f.data.Lookup([]byte(substring), -1))
 	postResult := make([]string, 0, len(preResult))
 	set := make(map[string]bool)
@@ -54,7 +54,7 @@ func (f FakeRepository) GetWordsContains(substring string, limit int) []string {
 	if limit < 0 || limit > len(preResult) {
 		limit = len(preResult)
 	}
-	return preResult[:limit]
+	return nil, preResult[:limit]
 }
 
 func MakeFakeRepository(words []string) *FakeRepository {
