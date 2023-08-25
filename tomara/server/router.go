@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"tomara-service/tomara/repository"
 )
@@ -12,7 +13,8 @@ const (
 )
 
 func GetServerDefault() *gin.Engine {
-	tomaraRepository := repository.MakeMySqlRepositoryDefaultConfig()
+	tomaraRepository := repository.GetFirstValidRepository()
+	fmt.Printf("Repository type: %s\n", tomaraRepository.DBType())
 	return GetServer(tomaraRepository)
 }
 
