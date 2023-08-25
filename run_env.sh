@@ -1,2 +1,2 @@
 echo "Running..."
-export GIN_MODE=release ; go run main.go
+go run main.go

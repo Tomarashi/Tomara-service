@@ -1,2 +1,2 @@
 echo "Building..."
-export GIN_MODE=release ; go build main.go
+go build main.go

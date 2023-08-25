@@ -61,7 +61,9 @@ func (w WordController) GetWords(c *gin.Context) {
 	wordNumber := defaultWordN
 	if wordNArgStr, ok := c.GetQuery(queryParamWordN); ok {
 		if wordNArg, err := strconv.Atoi(wordNArgStr); err == nil {
-			wordNumber = wordNArg
+			if wordNArg >= 1 {
+				wordNumber = wordNArg
+			}
 		}
 	}
 	err, result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
