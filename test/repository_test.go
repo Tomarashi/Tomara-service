@@ -13,25 +13,25 @@ func TestFakeRepository(t *testing.T) {
 
 	fakeRepository := repository.MakeFakeRepositoryFromFile(TestDataFilePath)
 
-	result = fakeRepository.GetWordsContains("ა", 200)
+	_, result = fakeRepository.GetWordsContains("ა", 200)
 	assert.Equal(t, 200, len(result))
 
-	result = fakeRepository.GetWordsContains("აა", math.MaxInt)
+	_, result = fakeRepository.GetWordsContains("აა", math.MaxInt)
 	assert.Equal(t, 26, len(result))
 
 	testWord = "დადებითი"
-	result = fakeRepository.GetWordsContains(testWord, math.MaxInt)
+	_, result = fakeRepository.GetWordsContains(testWord, math.MaxInt)
 	assert.Equal(t, []string{testWord}, result)
 
-	result = fakeRepository.GetWordsStartsWith("აა", math.MaxInt)
+	_, result = fakeRepository.GetWordsStartsWith("აა", math.MaxInt)
 	assert.Equal(t, 0, len(result))
 
-	result = fakeRepository.GetWordsStartsWith("ბი", math.MaxInt)
+	_, result = fakeRepository.GetWordsStartsWith("ბი", math.MaxInt)
 	assert.Equal(t, 24, len(result))
 
-	result = fakeRepository.GetWordsStartsWith("ერთ", 1)
+	_, result = fakeRepository.GetWordsStartsWith("ერთ", 1)
 	assert.Equal(t, []string{"ერთ"}, result)
 
-	result = fakeRepository.GetWordsStartsWith("ერთ", math.MaxInt)
+	_, result = fakeRepository.GetWordsStartsWith("ერთ", math.MaxInt)
 	assert.True(t, contains(result, "ერთ-ერთი"))
 }

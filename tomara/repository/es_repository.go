@@ -60,6 +60,18 @@ func buildQuery(opts buildQueryOptions) (error, []byte) {
 	return nil, buf.Bytes()
 }
 
+func (e *ElasticSearchRepository) CheckDatabase() (bool, error) {
+	_, err := e.client.Ping()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (e *ElasticSearchRepository) DBType() string {
+	return "ElasticSearchRepository"
+}
+
 func (e *ElasticSearchRepository) makeRequest(queryBytes []byte) (error, []string) {
 	castErrorFmt := func(fieldName string) error {
 		return fmt.Errorf("can't cast '%s'", fieldName)

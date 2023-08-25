@@ -35,6 +35,18 @@ func init() {
 	}
 }
 
+func (m MySqlRepository) CheckDatabase() (bool, error) {
+	err := m.database.Ping()
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (m MySqlRepository) DBType() string {
+	return "MySqlRepository"
+}
+
 func (m MySqlRepository) formatQueryString(
 	searchColumnName string, substring string, limit int, onlyStartsWith bool,
 ) string {

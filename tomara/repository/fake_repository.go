@@ -12,6 +12,14 @@ type FakeRepository struct {
 	data *suffixarray.Index
 }
 
+func (f FakeRepository) CheckDatabase() (bool, error) {
+	return true, nil
+}
+
+func (f FakeRepository) DBType() string {
+	return "FakeRepository"
+}
+
 func (f FakeRepository) extractWords(indexes []int) []string {
 	result := make([]string, 0, len(indexes))
 	bytesData := f.data.Bytes()
