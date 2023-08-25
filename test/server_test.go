@@ -44,7 +44,7 @@ func TestGreetings(t *testing.T) {
 
 	tomaraServer.ServeHTTP(recorder, request)
 	assert.Equal(t, 200, recorder.Code)
-	assert.Equal(t, "Hello!", recorder.Body.String())
+	assert.Equal(t, `{"message":"Hello!","db_type":"FakeRepository"}`, recorder.Body.String())
 }
 
 func TestGetOneCharNoLimit(t *testing.T) {
