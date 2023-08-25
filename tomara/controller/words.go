@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 	"tomara-service/tomara/repository"
-	"tomara-service/tomara/utils"
 )
 
 const (
@@ -22,24 +21,30 @@ type WordController struct {
 	Repository repository.ITomaraRepository
 }
 
+type GreetingsResponse struct {
+	Msg    string `json:"message"`
+	DBType string `json:"db_type"`
+}
+
 type GetWordsFailResponse struct {
 	ErrorMsg string `json:"error_msg"`
 }
 
 type GetWordsResponse struct {
-	Words      []string `json:"words"`
-	TakenNanos int64    `json:"taken_ns"`
+	Words []string `json:"words"`
 }
 
 type GetWordsResponseWithReqId struct {
-	Words      []string `json:"words"`
-	TakenNanos int64    `json:"taken_ns"`
-	RequestId  string   `json:"request_id"`
+	Words     []string `json:"words"`
+	RequestId string   `json:"request_id"`
 }
 
 func (w WordController) Greetings(c *gin.Context) {
 	c.Header(allowOriginHeaderName, "*")
-	c.String(http.StatusOK, "Hello!")
+	c.JSON(http.StatusOK, GreetingsResponse{
+		Msg:    "Hello!",
+		DBType: w.Repository.DBType(),
+	})
 }
 
 func (w WordController) GetWords(c *gin.Context) {
@@ -50,7 +55,7 @@ func (w WordController) GetWords(c *gin.Context) {
 		return
 	}
 	if subWord == "" {
-		c.JSON(http.StatusOK, GetWordsResponse{Words: []string{}, TakenNanos: 0})
+		c.JSON(http.StatusOK, GetWordsResponse{Words: []string{}})
 		return
 	}
 	wordNumber := defaultWordN
@@ -59,16 +64,14 @@ func (w WordController) GetWords(c *gin.Context) {
 			wordNumber = wordNArg
 		}
 	}
-	startTime := utils.CurrentNanos()
 	err, result := w.Repository.GetWordsStartsWith(subWord, wordNumber)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, GetWordsFailResponse{ErrorMsg: err.Error()})
 		return
 	}
-	takenTime := utils.FromTimeInNanos(startTime)
 	if requestId, exists := c.GetQuery(queryParamRequestId); exists {
-		c.JSON(http.StatusOK, GetWordsResponseWithReqId{Words: result, TakenNanos: takenTime, RequestId: requestId})
+		c.JSON(http.StatusOK, GetWordsResponseWithReqId{Words: result, RequestId: requestId})
 	} else {
-		c.JSON(http.StatusOK, GetWordsResponse{Words: result, TakenNanos: takenTime})
+		c.JSON(http.StatusOK, GetWordsResponse{Words: result})
 	}
 }
