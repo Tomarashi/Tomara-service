@@ -50,12 +50,8 @@ func (w WordController) Greetings(c *gin.Context) {
 func (w WordController) GetWords(c *gin.Context) {
 	subWord, exists := c.GetQuery(queryParamSubWord)
 	c.Header(allowOriginHeaderName, "*")
-	if !exists {
-		c.String(http.StatusBadRequest, HttpParameterNotExist(queryParamSubWord))
-		return
-	}
-	if subWord == "" {
-		c.JSON(http.StatusOK, GetWordsResponse{Words: []string{}})
+	if !exists || subWord == "" {
+		c.JSON(http.StatusBadRequest, HttpParameterNotExist(queryParamSubWord))
 		return
 	}
 	wordNumber := defaultWordN

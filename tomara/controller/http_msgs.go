@@ -4,6 +4,11 @@ import (
 	"fmt"
 )
 
-func HttpParameterNotExist(paramName string) string {
-	return fmt.Sprintf("Parameter '%s' doesn't exist", paramName)
+type ErrorMessage struct {
+	Msg    string `json:"message"`
+}
+
+func HttpParameterNotExist(paramName string) ErrorMessage {
+	msg := fmt.Sprintf("Parameter '%s' doesn't exist", paramName)
+	return ErrorMessage{Msg: msg}
 }
