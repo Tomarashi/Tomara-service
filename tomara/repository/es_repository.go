@@ -8,12 +8,27 @@ import (
 	"github.com/elastic/go-elasticsearch/v8/esapi"
 	"golang.org/x/net/context"
 	"io"
+	"strings"
 )
 
 const (
 	anyCharRegex     = ".*"
 	wordGeoFieldName = "word_geo"
 )
+
+var (
+	requestIndex      []string
+	requestFilterPath []string
+)
+
+func init() {
+	requestIndex = []string{"words"}
+	requestFilterPath = []string{
+		"hits.hits._source.word_geo",
+		"hits.total.value",
+		"took",
+	}
+}
 
 type ElasticSearchRepository struct {
 	client *elasticsearch.Client
@@ -73,14 +88,27 @@ func (e *ElasticSearchRepository) DBType() string {
 }
 
 func (e *ElasticSearchRepository) makeRequest(queryBytes []byte) (error, []string) {
-	castErrorFmt := func(fieldName string) error {
-		return fmt.Errorf("can't cast '%s'", fieldName)
+	extractValue := func(values map[string]interface{}, fields string) (error, interface{}) {
+		var castOk bool
+		fieldsArr := strings.Split(fields, ".")
+		currVal := values
+		for i, field := range fieldsArr {
+			if i == len(fieldsArr)-1 {
+				break
+			}
+			currVal, castOk = currVal[field].(map[string]interface{})
+			if !castOk {
+				fieldName := strings.Join(fieldsArr[0:i+1], ".")
+				return fmt.Errorf("can't cast '%s'", fieldName), nil
+			}
+		}
+		return nil, currVal[fieldsArr[len(fieldsArr)-1]]
 	}
 
 	request := esapi.SearchRequest{
-		Index:      []string{"words"},
+		Index:      requestIndex,
 		Body:       bytes.NewReader(queryBytes),
-		FilterPath: []string{"hits.hits._source.word_geo", "took"},
+		FilterPath: requestFilterPath,
 	}
 	response, err := request.Do(context.Background(), e.client)
 	if err != nil {
@@ -101,27 +129,24 @@ func (e *ElasticSearchRepository) makeRequest(queryBytes []byte) (error, []strin
 		return err, nil
 	}
 
-	hitsMap, castOk := bodyMap["hits"].(map[string]interface{})
-	if !castOk {
-		return castErrorFmt("hits"), nil
-	}
-
-	sourceList, castOk := hitsMap["hits"].([]interface{})
-	if !castOk {
-		return castErrorFmt("hits.hits"), nil
+	var sourceList []interface{}
+	if err, val := extractValue(bodyMap, "hits.hits"); err == nil {
+		if val == nil {
+			return nil, []string{}
+		} else {
+			sourceList = val.([]interface{})
+		}
+	} else {
+		return err, nil
 	}
 
 	result := make([]string, 0, len(sourceList))
-	for i, sourceElem := range sourceList {
-		sourceMap, castOk := sourceElem.(map[string]interface{})
-		if !castOk {
-			return castErrorFmt(fmt.Sprintf("hits.hits[%d]", i)), nil
+	for _, sourceElem := range sourceList {
+		err, val := extractValue(sourceElem.(map[string]interface{}), "_source.word_geo")
+		if err != nil {
+			return err, nil
 		}
-		val, castOk := sourceMap["_source"].(map[string]interface{})
-		if !castOk {
-			return castErrorFmt(fmt.Sprintf("hits.hits[%d]_source", i)), nil
-		}
-		result = append(result, val["word_geo"].(string))
+		result = append(result, val.(string))
 	}
 	return nil, result
 }
